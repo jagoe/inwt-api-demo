@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +11,6 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
-
-app.UseSwagger();
 
 app.UseHttpsRedirection();
 
