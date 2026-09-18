@@ -57,6 +57,8 @@ Return predicted load (simultaneous viewers) within a 24 hour window.
 
 ### C4-Modell
 
+Interaktive Diagramme und Views befinden sich auf Isoflow: <https://isoflow.io/project/cmu583ays01ia1qti08ijv8jo/>
+
 #### C1
 
 <image src="https://i.imgur.com/ncx22Wc.png" alt="C1" width="300" />
@@ -75,11 +77,15 @@ Return predicted load (simultaneous viewers) within a 24 hour window.
   * Entweder ein Prozess für Daten aus beiden Datenbanken (geringerer Maintenance-Overhead) oder zwei Prozesse (möglich, die vermutlich selten veränderten Metadaten seltener zu extrahieren) – vermutlich auch abhängig davon, welche Features extrahiert werden sollen
   * Trainingsdatenbank sollte für große, analytische Datenmengen geeignet sein, z.B. AWS Redshift
   * Täglicher Durchlauf sollte genügen, da die Daten vom Kunden täglich bereitgestellt werden
+ 
+[Diagramm](https://isoflow.io/project/cmu583ays01ia1qti08ijv8jo/version/cmu6oqdv201kk1qtivlsvruf2/c4/views/9da8744f-0ff4-4b21-adc7-0c82d985c442)
 
 ### Datentransformation (live)
 
 * Ein langläufiger Prozess konsumiert den Live-Stream des Kunden (z.B. AWS Fargate via AWS MSK) und transformiert die Daten
   * Vermutlich Unterscheidung zwischen statischen Trainingsdaten und Parametern für die Prognoseerstellung; Daten können aber vermutlich in jedem Fall in der Trainingsdatenbank gespeichert werden, da sowohl Training, als auch Prognosegenerierung vermutlich nicht zeitkritisch sind
+
+[Diagramm](https://isoflow.io/project/cmu583ays01ia1qti08ijv8jo/version/cmu6oqdv201kk1qtivlsvruf2/c4/views/5f51b53a-141e-4a53-ad6a-b6d7532f9dd4)
 
 ### Modellgenerierung
 
@@ -87,15 +93,21 @@ Return predicted load (simultaneous viewers) within a 24 hour window.
   * Die Frequenzbestimmung liegt außerhalb des Scopes dieser Challenge
   * Ein möglicher Service wäre AWS SageMaker
 
+[Diagramm](https://isoflow.io/project/cmu583ays01ia1qti08ijv8jo/version/cmu6oqdv201kk1qtivlsvruf2/c4/views/eb27cbae-9345-46a6-b8ae-c507526dc889)
+
 ### Prognoseerstellung
 
 * Die Prognosedaten werden regelmäßig vom aktuellsten Modell generiert und in einer In-Memory-Datenbank für schnellen Zugriff durch den API-Server bereitgestellt
   * 15 Minuten wäre ein sinnvoller Default, da das auch die Auflösung der Prognosedaten ist
   * Die aus den Live-Daten transformierten Features dienen als Eingabeparameter für das Modell
 
+[Diagramm](https://isoflow.io/project/cmu583ays01ia1qti08ijv8jo/version/cmu6oqdv201kk1qtivlsvruf2/c4/views/81e30aff-4e15-4666-a55e-03c31632d3a6)
+
 ## API
 
 Aufgrund der geringen Anzahl von Anwendungsfällen genügt eine REST-like API, z.B. ASP.NET MVC in AWS AppRunner.
+
+[Diagramm](https://isoflow.io/project/cmu583ays01ia1qti08ijv8jo/version/cmu6oqdv201kk1qtivlsvruf2/c4/views/6c1639e8-19da-4e9f-b8ed-45663f37021d)
 
 ### Endpunkte & Aggregation
 
