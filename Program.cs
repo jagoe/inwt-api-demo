@@ -17,34 +17,35 @@ app.UseSwagger();
 
 app.UseHttpsRedirection();
 
-app.MapGet("/predictions/load", ([FromQuery] DateTime? from, [FromQuery] DateTime? to, [FromQuery] string? groupBy, [FromQuery] int? movieId, [FromQuery] string? region) =>
+app.MapGet("/predictions/load",
+([AsParameters] PredictionFilter filter) =>
 {
 
     var predictions = DummyPredictions.Predictions.AsEnumerable();
 
-    if (from is not null)
+    if (filter.From is not null)
     {
-        predictions = predictions.Where(p => p.From >= from);
+        predictions = predictions.Where(p => p.From >= filter.From);
     }
 
-    if (to is not null)
+    if (filter.To is not null)
     {
-        predictions = predictions.Where(p => p.To <= to);
+        predictions = predictions.Where(p => p.To <= filter.To);
     }
 
-    if (movieId is not null)
+    if (filter.MovieId is not null)
     {
-        predictions = predictions.Where(p => p.MovieId == movieId);
+        predictions = predictions.Where(p => p.MovieId == filter.MovieId);
     }
 
-    if (region is not null)
+    if (filter.Region is not null)
     {
-        predictions = predictions.Where(p => p.Region == region);
+        predictions = predictions.Where(p => p.Region == filter.Region);
     }
 
-    if (groupBy is not null)
+    if (filter.GroupBy is not null)
     {
-        switch (groupBy)
+        switch (filter.GroupBy)
         {
             case "movie":
                 return Results.Ok(predictions
@@ -83,18 +84,20 @@ app.MapGet("/predictions/load", ([FromQuery] DateTime? from, [FromQuery] DateTim
         To = p.To,
     }));
 })
-.WithName("Load predictions").AddEndpointFilter(async (invocationContext, next) =>
+.WithName("Load predictions")
+.WithDescription("Return predicted load (simultaneous viewers) within a 24 hour window.")
+.Produces(200, typeof(PredictionDto))
+.Produces(400)
+.AddEndpointFilter(async (invocationContext, next) =>
     {
-        var from = invocationContext.GetArgument<DateTime?>(0);
-        var to = invocationContext.GetArgument<DateTime?>(1);
-        var groupBy = invocationContext.GetArgument<string?>(2);
+        var filter = invocationContext.GetArgument<PredictionFilter>(0);
 
-        if (to < from)
+        if (filter.To < filter.From)
         {
             return Results.BadRequest(@"""to"" must be greater than ""from"".");
         }
 
-        if (groupBy != "movie" && groupBy != "region")
+        if (filter.GroupBy is not null && filter.GroupBy != "movie" && filter.GroupBy != "region")
         {
             return Results.BadRequest(@"""groupBy"" must be one of ""movie"" or ""region"".");
         }
